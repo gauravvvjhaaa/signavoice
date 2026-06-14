@@ -1,0 +1,1340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+<title>SignaVoice v4 — Gaurav Jha</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#080c18;--bg1:#0e1225;--bg2:#141830;
+  --pur:#7c3aed;--pur2:#a78bfa;--pur3:#c4b5fd;
+  --cyan:#06b6d4;--c2:#67e8f9;
+  --g:#10b981;--r:#ef4444;--a:#f59e0b;
+  --tx:#e2e8f0;--t2:#94a3b8;--t3:#475569;
+  --bd:rgba(124,58,237,.22);
+  --gp:0 0 16px rgba(124,58,237,.5),0 0 32px rgba(124,58,237,.18);
+  --fh:'Orbitron',monospace;--fr:'Rajdhani',sans-serif;--fm:'Space Mono',monospace;
+}
+html,body{height:100%;background:var(--bg);color:var(--tx);font-family:var(--fr);overflow:hidden}
+body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.04) 2px,rgba(0,0,0,.04) 4px);pointer-events:none;z-index:9999}
+.gbg{position:fixed;inset:0;background-image:linear-gradient(rgba(124,58,237,.044) 1px,transparent 1px),linear-gradient(90deg,rgba(124,58,237,.044) 1px,transparent 1px);background-size:50px 50px;animation:gbg 22s linear infinite;z-index:0;pointer-events:none}
+@keyframes gbg{to{background-position:0 50px,50px 0}}
+#app{position:relative;z-index:1;display:grid;grid-template-rows:52px 1fr 100px;height:100vh;max-height:100dvh}
+#main{display:grid;grid-template-columns:168px 1fr 256px 286px;min-height:0;overflow:hidden}
+
+/* HEADER */
+#hdr{display:flex;align-items:center;justify-content:space-between;padding:0 18px;border-bottom:1px solid var(--bd);background:rgba(8,12,24,.97);backdrop-filter:blur(16px)}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-ico{width:30px;height:30px;background:linear-gradient(135deg,var(--pur),var(--cyan));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;box-shadow:var(--gp);flex-shrink:0}
+.logo-tx{font-family:var(--fh);font-size:15px;font-weight:900;letter-spacing:3px;color:var(--tx);line-height:1}
+.logo-tx em{color:var(--pur2);font-style:normal}
+.logo-by{font-family:var(--fm);font-size:7px;color:var(--t3);letter-spacing:2px;margin-top:1px}
+.hctr{display:flex;gap:7px}
+.pill{display:flex;align-items:center;gap:6px;background:var(--bg2);border:1px solid var(--bd);border-radius:6px;padding:4px 10px;font-family:var(--fm);font-size:9px;color:var(--t2)}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--t3);flex-shrink:0}
+.dot.live{background:var(--g);box-shadow:0 0 8px var(--g);animation:blk 2s infinite}
+.dot.pur{background:var(--pur2);box-shadow:0 0 5px var(--pur2)}
+@keyframes blk{0%,100%{opacity:1}50%{opacity:.18}}
+.hrgt{display:flex;gap:7px}
+.hbtn{font-family:var(--fm);font-size:9px;letter-spacing:1px;border:1px solid var(--bd);background:transparent;padding:5px 12px;cursor:pointer;border-radius:6px;transition:all .2s;color:var(--pur3)}
+.hbtn:hover{background:rgba(124,58,237,.18);border-color:var(--pur);transform:translateY(-1px)}
+.hbtn:active{transform:translateY(0)}
+.hbtn.on{background:rgba(124,58,237,.2);border-color:var(--pur);box-shadow:0 0 8px rgba(124,58,237,.3)}
+.hbtn.off{color:var(--t3);border-color:rgba(255,255,255,.06)}
+.hbtn.danger{color:#fca5a5;border-color:rgba(239,68,68,.3)}
+.hbtn.danger:hover{background:rgba(239,68,68,.12);border-color:var(--r)}
+
+/* SIDEBAR */
+#sb{background:var(--bg1);border-right:1px solid var(--bd);display:flex;flex-direction:column;padding:14px 10px;gap:3px;overflow:hidden}
+.sb-s{font-family:var(--fm);font-size:8px;color:var(--t3);letter-spacing:3px;padding:8px 10px 4px}
+.sb-i{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:7px;font-size:13px;font-weight:600;color:var(--t2);transition:all .18s;cursor:pointer;user-select:none}
+.sb-i:hover{background:rgba(124,58,237,.08);color:var(--pur3)}
+.sb-i.act{background:linear-gradient(90deg,rgba(124,58,237,.22),rgba(124,58,237,.04));color:var(--pur3);border-left:2px solid var(--pur)}
+.sb-ico{font-size:14px;min-width:17px;text-align:center}
+.sb-ft{margin-top:auto;padding:10px;background:linear-gradient(135deg,rgba(124,58,237,.12),rgba(6,182,212,.06));border:1px solid var(--bd);border-radius:10px}
+.sb-ft strong{color:var(--pur3);display:block;font-size:12px;letter-spacing:1px;margin-bottom:3px}
+.sb-ft p{font-size:10px;color:var(--t2);line-height:1.7}
+
+/* CAMERA */
+#cam-panel{position:relative;background:#000;overflow:hidden;display:flex;flex-direction:column;border-right:1px solid var(--bd)}
+.cam-hdr{display:flex;align-items:center;justify-content:space-between;padding:6px 12px;background:rgba(8,12,24,.93);border-bottom:1px solid var(--bd);flex-shrink:0}
+.cam-title{font-family:var(--fr);font-size:11px;font-weight:600;color:var(--t2);letter-spacing:3px}
+.cbadges{display:flex;gap:5px}
+.cbadge{font-family:var(--fm);font-size:8px;border:1px solid rgba(255,255,255,.08);padding:2px 7px;border-radius:4px;color:var(--t3);letter-spacing:1px}
+.cbadge.live{border-color:rgba(16,185,129,.3);color:var(--g)}
+.cam-area{flex:1;position:relative;overflow:hidden}
+#video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scaleX(-1);opacity:.88}
+#canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:3}
+.frame{position:absolute;inset:0;pointer-events:none;z-index:4}
+.cr{position:absolute;width:20px;height:20px}
+.cr::before{content:'';position:absolute;width:100%;height:2px;top:0;left:0;background:var(--pur2);box-shadow:0 0 6px var(--pur2)}
+.cr::after{content:'';position:absolute;width:2px;height:100%;top:0;left:0;background:var(--pur2);box-shadow:0 0 6px var(--pur2)}
+.cr.tl{top:12px;left:12px}.cr.tr{top:12px;right:12px;transform:rotate(90deg)}
+.cr.bl{bottom:12px;left:12px;transform:rotate(270deg)}.cr.br{bottom:12px;right:12px;transform:rotate(180deg)}
+.scanbar{position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--pur3),var(--c2),var(--pur3),transparent);box-shadow:0 0 8px var(--pur2);animation:sc 4s ease-in-out infinite;z-index:5;pointer-events:none}
+@keyframes sc{0%{top:0;opacity:0}5%{opacity:1}95%{opacity:.7}100%{top:100%;opacity:0}}
+#dflash{position:absolute;inset:0;display:none;align-items:center;justify-content:center;pointer-events:none;z-index:6}
+#dflash.show{display:flex}
+#dglyph{font-size:80px;filter:drop-shadow(0 0 20px var(--cyan));animation:dpop .45s ease-out}
+@keyframes dpop{0%{transform:scale(.2) rotate(-20deg);opacity:0}60%{transform:scale(1.12)}100%{transform:scale(1);opacity:1}}
+
+/* GESTURE DETECTED OVERLAY */
+#goverlay{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);z-index:7;pointer-events:none;opacity:0;transition:opacity .3s}
+#goverlay.show{opacity:1}
+.go-inner{display:flex;align-items:center;gap:8px;background:rgba(8,12,24,.88);border:1px solid var(--bd);border-radius:10px;padding:8px 14px;backdrop-filter:blur(10px);box-shadow:var(--gp)}
+.go-emoji{font-size:22px}
+.go-name{font-family:var(--fh);font-size:10px;font-weight:900;letter-spacing:2px;color:var(--pur3)}
+
+/* LOADER */
+#loader{position:absolute;inset:0;z-index:20;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0}
+#loader::before{content:'';position:absolute;inset:0;background-image:repeating-linear-gradient(0deg,transparent,transparent 28px,rgba(124,58,237,.048) 28px,rgba(124,58,237,.048) 29px);pointer-events:none}
+.ld-rw{position:relative;width:108px;height:108px;margin-bottom:20px;flex-shrink:0}
+.ld-r{position:absolute;border-radius:50%;border:2px solid transparent}
+.ld-r:nth-child(1){inset:0;border-top-color:var(--pur);animation:lspin 1.1s linear infinite}
+.ld-r:nth-child(2){inset:13px;border-top-color:var(--cyan);animation:lspin 1.7s linear infinite reverse}
+.ld-r:nth-child(3){inset:26px;border-top-color:var(--pur3);animation:lspin 2.5s linear infinite}
+@keyframes lspin{to{transform:rotate(360deg)}}
+.ld-ctr{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:28px;filter:drop-shadow(0 0 10px var(--pur))}
+.ld-logo{font-family:var(--fh);font-size:18px;font-weight:900;letter-spacing:5px;color:var(--tx);margin-bottom:4px}
+.ld-logo em{color:var(--pur2);font-style:normal}
+.ld-by{font-family:var(--fm);font-size:7px;color:var(--t3);letter-spacing:2px;margin-bottom:18px}
+.ld-steps{display:flex;flex-direction:column;gap:6px;width:240px;margin-bottom:14px}
+.ld-step{display:flex;align-items:center;gap:8px;padding:7px 11px;border-radius:7px;background:var(--bg1);border:1px solid rgba(124,58,237,.1);transition:all .35s;opacity:.28}
+.ld-step.active{opacity:1;border-color:rgba(124,58,237,.55);background:rgba(124,58,237,.09)}
+.ld-step.done{opacity:.6;border-color:rgba(16,185,129,.3);background:rgba(16,185,129,.04)}
+.ld-step.err{opacity:1;border-color:rgba(239,68,68,.4)}
+.step-ico{font-size:14px;min-width:19px;text-align:center}
+.step-tx{flex:1}
+.step-ti{font-family:var(--fr);font-size:11px;font-weight:600;color:var(--tx);letter-spacing:1px}
+.step-sb{font-family:var(--fm);font-size:7px;color:var(--t3)}
+.step-st{font-family:var(--fm);font-size:8px;color:var(--t3);margin-left:auto;white-space:nowrap}
+.step-st.ds{color:var(--g)}.step-st.as{color:var(--pur3);animation:blk 1s infinite}.step-st.es{color:var(--r)}
+.ld-bar{width:240px;height:3px;background:rgba(124,58,237,.1);border-radius:2px;overflow:hidden;margin-bottom:10px}
+.ld-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--pur),var(--cyan));border-radius:2px;transition:width .5s ease}
+#ldmsg{font-family:var(--fm);font-size:8px;color:var(--t3);letter-spacing:2px;text-align:center}
+#lderr{font-size:9px;color:var(--r);max-width:228px;text-align:center;line-height:1.8;display:none;margin-top:6px}
+#ldretry{font-family:var(--fr);font-size:12px;font-weight:700;letter-spacing:3px;color:#fff;background:linear-gradient(135deg,var(--pur),var(--cyan));border:none;padding:10px 26px;cursor:pointer;border-radius:8px;box-shadow:var(--gp);display:none;margin-top:10px;transition:all .2s}
+#ldretry:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(124,58,237,.5)}
+
+/* HOLOGRAM */
+#holo-panel{background:var(--bg1);border-right:1px solid var(--bd);display:flex;flex-direction:column;overflow:hidden}
+.hp-top{display:flex;align-items:center;justify-content:space-between;padding:7px 12px;border-bottom:1px solid var(--bd);flex-shrink:0}
+.hp-title{font-family:var(--fr);font-size:10px;font-weight:600;color:var(--t2);letter-spacing:3px}
+#hp-id{font-family:var(--fm);font-size:8px;color:var(--t3)}
+.holo-area{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;min-height:0;padding:12px 10px}
+.hglow{position:absolute;width:140px;height:140px;border-radius:50%;background:radial-gradient(circle,rgba(124,58,237,.1) 0%,rgba(6,182,212,.05) 50%,transparent 70%);filter:blur(16px);animation:glwP 3s ease-in-out infinite;pointer-events:none}
+@keyframes glwP{0%,100%{transform:scale(1);opacity:.7}50%{transform:scale(1.18);opacity:1}}
+.holo-rings{position:absolute;width:146px;height:146px;pointer-events:none}
+.hring{position:absolute;border-radius:50%;border:1px solid}
+.hring:nth-child(1){inset:0;border-color:rgba(124,58,237,.24);animation:hspin 9s linear infinite}
+.hring:nth-child(2){inset:13px;border-color:rgba(6,182,212,.18);animation:hspin 6s linear infinite reverse;border-style:dashed}
+.hring:nth-child(3){inset:26px;border-color:rgba(124,58,237,.12);animation:hspin 13s linear infinite}
+@keyframes hspin{to{transform:rotate(360deg)}}
+.hbase{position:absolute;bottom:44px;width:82px;height:4px;background:radial-gradient(ellipse at center,var(--pur) 0%,rgba(124,58,237,.2) 50%,transparent 100%);border-radius:50%;box-shadow:0 0 18px var(--pur),0 0 34px rgba(124,58,237,.16);animation:bpls 2s ease-in-out infinite}
+@keyframes bpls{0%,100%{opacity:.8;transform:scaleX(1)}50%{opacity:1;transform:scaleX(1.1)}}
+.hbeam{position:absolute;bottom:48px;width:80px;height:52%;background:linear-gradient(0deg,rgba(124,58,237,.09) 0%,rgba(6,182,212,.03) 50%,transparent 100%);clip-path:polygon(18% 100%,82% 100%,100% 0%,0% 0%);pointer-events:none}
+.hsweep{position:absolute;bottom:52px;left:50%;transform:translateX(-50%);width:68px;height:1.5px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);box-shadow:0 0 6px var(--cyan);animation:hsw 2.5s ease-in-out infinite}
+@keyframes hsw{0%{bottom:52px;opacity:0}8%{opacity:1}92%{opacity:.7}100%{bottom:56%;opacity:0}}
+.hparts{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.hp2{position:absolute;width:2px;height:2px;border-radius:50%;background:var(--pur2);box-shadow:0 0 4px var(--pur2);animation:hpf linear infinite;opacity:0}
+@keyframes hpf{0%{transform:translateY(0);opacity:0}10%{opacity:1}90%{opacity:.5}100%{transform:translateY(-120px);opacity:0}}
+#holo-emoji{font-size:62px;position:relative;z-index:2;line-height:1;margin-bottom:6px;display:none;animation:hfl 3.5s ease-in-out infinite}
+@keyframes hfl{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+#holo-emoji.pop{animation:hpop .42s cubic-bezier(.175,.885,.32,1.275) forwards,hfl 3.5s ease-in-out .45s infinite}
+@keyframes hpop{0%{transform:scale(.1) rotate(-18deg);opacity:0;filter:blur(8px)}60%{transform:scale(1.2) rotate(3deg)}100%{transform:scale(1) rotate(0);opacity:1;filter:blur(0)}}
+#holo-name{font-family:var(--fr);font-size:13px;font-weight:700;letter-spacing:3px;text-align:center;position:relative;z-index:2;text-transform:uppercase;min-height:18px;transition:color .2s;color:var(--pur3)}
+#h-idle{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+.idle-ring{width:68px;height:68px;border-radius:50%;border:1px solid rgba(124,58,237,.2);display:flex;align-items:center;justify-content:center;position:relative;animation:idlP 2.5s ease-in-out infinite}
+@keyframes idlP{0%,100%{border-color:rgba(124,58,237,.15)}50%{border-color:rgba(124,58,237,.5);box-shadow:0 0 14px rgba(124,58,237,.18)}}
+.idle-ring::after{content:'';position:absolute;inset:-9px;border-radius:50%;border:1px dashed rgba(124,58,237,.1);animation:hspin 7s linear infinite}
+.idle-ico{font-size:24px;opacity:.18}
+#idle-txt{font-family:var(--fm);font-size:8px;color:var(--t3);letter-spacing:2px;text-align:center;line-height:2}
+#idle-alert{color:var(--r);font-size:9px;letter-spacing:3px;animation:blk 1.6s infinite;display:block;margin-bottom:2px}
+.hp-conf{flex-shrink:0;padding:7px 12px 8px;border-top:1px solid rgba(124,58,237,.1)}
+.crow{display:flex;justify-content:space-between;font-family:var(--fm);font-size:8px;color:var(--t3);margin-bottom:4px;letter-spacing:1px}
+#ctrack{height:3px;background:rgba(124,58,237,.1);border-radius:2px;overflow:hidden}
+#cfill{height:100%;width:0%;background:linear-gradient(90deg,var(--pur),var(--cyan));border-radius:2px;transition:width .25s;box-shadow:0 0 6px var(--pur)}
+.hp-strip{flex-shrink:0;padding:5px 12px 7px;border-top:1px solid var(--bd)}
+.sr{display:flex;justify-content:space-between;font-family:var(--fm);font-size:8px;color:var(--t3);letter-spacing:1px}
+.sr:not(:last-child){margin-bottom:3px}
+.sv{color:var(--pur3)}
+
+/* RIGHT */
+#rp{display:flex;flex-direction:column;background:var(--bg1);min-height:0}
+.rp-sec{flex-shrink:0;padding:10px 12px;border-bottom:1px solid var(--bd)}
+.rp-lbl{font-family:var(--fr);font-size:10px;font-weight:600;color:var(--t3);letter-spacing:3px;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between}
+.rp-lbl span{font-family:var(--fm);font-size:8px;color:var(--t3)}
+#g-name{font-family:var(--fr);font-size:20px;font-weight:700;color:var(--pur3);letter-spacing:2px;text-transform:uppercase;transition:all .2s;min-height:26px}
+#g-desc{font-size:9px;color:var(--t3);margin-top:3px;min-height:13px;font-family:var(--fm)}
+#frow{display:flex;gap:6px;margin-top:10px}
+.fi-w{display:flex;flex-direction:column;align-items:center;gap:3px}
+.fibar{width:12px;height:34px;background:rgba(124,58,237,.05);border:1px solid rgba(124,58,237,.1);border-radius:6px;overflow:hidden;display:flex;align-items:flex-end}
+.fifill{width:100%;height:12%;background:var(--t3);border-radius:4px;transition:height .12s,background .12s,box-shadow .12s}
+.fifill.up{height:100%;background:linear-gradient(0deg,var(--pur),var(--pur2));box-shadow:0 0 8px rgba(124,58,237,.6)}
+.filbl{font-family:var(--fm);font-size:7px;color:var(--t3);letter-spacing:.5px}
+#dgrid{display:grid;grid-template-columns:repeat(3,24px);grid-template-rows:repeat(3,24px);gap:3px;margin-top:10px}
+.darr{border:1px solid rgba(124,58,237,.1);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--t3);transition:all .18s;background:rgba(124,58,237,.04)}
+.darr.on{border-color:var(--cyan);background:rgba(6,182,212,.13);color:var(--c2);box-shadow:0 0 10px rgba(6,182,212,.26)}
+.dc{font-family:var(--fm);font-size:7px;color:var(--t3);background:rgba(124,58,237,.07)}
+.srow{display:flex;align-items:center;gap:9px;padding:8px 12px;border-bottom:1px solid var(--bd);flex-shrink:0}
+.s-ico{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,rgba(16,185,129,.18),rgba(6,182,212,.09));border:1px solid rgba(16,185,129,.2);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.s-info{flex:1;min-width:0}
+.s-title{font-family:var(--fr);font-size:10px;font-weight:600;color:var(--g);letter-spacing:2px}
+.s-last{font-family:var(--fm);font-size:8px;color:var(--t3);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#wave{display:flex;align-items:center;gap:2px;height:20px;flex-shrink:0}
+.wb{width:3px;border-radius:2px;background:var(--g);opacity:.15}
+.wb.on{opacity:1;box-shadow:0 0 5px var(--g);animation:wv .5s ease-in-out infinite}
+.wb:nth-child(1){height:7px}.wb:nth-child(2){height:13px;animation-delay:.1s}
+.wb:nth-child(3){height:19px;animation-delay:.2s}.wb:nth-child(4){height:13px;animation-delay:.1s}.wb:nth-child(5){height:7px}
+@keyframes wv{0%,100%{transform:scaleY(.3)}50%{transform:scaleY(1)}}
+#txsec{flex:1;display:flex;flex-direction:column;padding:9px 12px 7px;min-height:0}
+.tx-top{display:flex;align-items:center;justify-content:space-between;flex-shrink:0;margin-bottom:7px}
+.tx-lbl{font-family:var(--fr);font-size:10px;font-weight:600;color:var(--t3);letter-spacing:3px}
+.txctrl{display:flex;gap:4px}
+.txbtn{font-family:var(--fm);font-size:7px;letter-spacing:1px;color:var(--t3);border:1px solid rgba(124,58,237,.14);background:transparent;padding:3px 7px;cursor:pointer;border-radius:4px;transition:all .15s}
+.txbtn:hover{color:var(--pur3);border-color:rgba(124,58,237,.4);background:rgba(124,58,237,.08)}
+.txbtn:active{transform:scale(.96)}
+#tbox{flex:1;min-height:0;background:rgba(0,0,0,.28);border:1px solid rgba(124,58,237,.12);border-radius:8px;padding:12px;overflow-y:auto;position:relative;display:flex;align-items:center;justify-content:center}
+#tbox::-webkit-scrollbar{width:3px}#tbox::-webkit-scrollbar-thumb{background:rgba(124,58,237,.3)}
+#tb-idle{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;pointer-events:none}
+.ti-ico{font-size:20px;opacity:.1}
+#tb-idle p{font-family:var(--fm);font-size:8px;color:var(--t3);letter-spacing:2px;text-align:center;line-height:2}
+#tx-word{display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+#tx-word.in{animation:txIn .36s cubic-bezier(.175,.885,.32,1.275)}
+@keyframes txIn{0%{opacity:0;transform:scale(.5) translateY(14px);filter:blur(8px)}70%{transform:scale(1.06) translateY(-2px)}100%{opacity:1;transform:scale(1) translateY(0);filter:blur(0)}}
+#tx-emoji{font-size:40px;margin-bottom:7px;line-height:1}
+#tx-name{font-family:var(--fh);font-size:20px;font-weight:900;letter-spacing:3px;text-transform:uppercase;line-height:1.1}
+#tx-type{font-family:var(--fm);font-size:8px;color:var(--t3);letter-spacing:3px;margin-top:6px}
+.tx-bot{display:flex;justify-content:space-between;align-items:center;margin-top:5px;flex-shrink:0}
+.tx-cnt{font-family:var(--fm);font-size:8px;color:var(--t3);letter-spacing:1px}
+#speak-all{font-family:var(--fm);font-size:8px;letter-spacing:1px;color:var(--g);border:1px solid rgba(16,185,129,.22);background:transparent;padding:3px 9px;cursor:pointer;border-radius:4px;transition:all .18s}
+#speak-all:hover{background:rgba(16,185,129,.12);border-color:var(--g);box-shadow:0 0 8px rgba(16,185,129,.2)}
+#speak-all:active{transform:scale(.96)}
+
+/* BOTTOM */
+#bot{display:flex;align-items:center;border-top:1px solid var(--bd);background:var(--bg1);padding:0 14px;overflow:hidden}
+.bot-lbl{font-family:var(--fr);font-size:10px;font-weight:600;letter-spacing:3px;color:var(--t3);white-space:nowrap;margin-right:12px;flex-shrink:0}
+#hist{display:flex;gap:5px;overflow-x:auto;padding:8px 0;flex:1}
+#hist::-webkit-scrollbar{height:2px}#hist::-webkit-scrollbar-thumb{background:rgba(124,58,237,.3)}
+.hi{display:flex;flex-direction:column;align-items:center;gap:2px;flex-shrink:0;padding:5px 9px;border:1px solid rgba(124,58,237,.14);border-radius:6px;background:rgba(124,58,237,.03);animation:hiIn .28s ease-out;cursor:pointer;transition:all .15s}
+.hi:hover{border-color:rgba(124,58,237,.4);background:rgba(124,58,237,.1)}
+@keyframes hiIn{from{opacity:0;transform:translateY(7px) scale(.88)}to{opacity:1;transform:none}}
+.hi-e{font-size:14px}.hi-l{font-family:var(--fm);font-size:7px;color:var(--t3);white-space:nowrap}
+.bot-r{display:flex;align-items:center;gap:7px;flex-shrink:0;margin-left:10px}
+#fpsd{font-family:var(--fm);font-size:9px;background:var(--bg2);border:1px solid rgba(124,58,237,.18);padding:4px 10px;border-radius:5px;color:var(--t3);min-width:56px;text-align:center}
+.bctrl{font-family:var(--fm);font-size:8px;letter-spacing:1px;border:1px solid rgba(124,58,237,.18);background:transparent;padding:4px 9px;cursor:pointer;border-radius:5px;color:var(--t3);transition:all .18s}
+.bctrl:hover{background:rgba(124,58,237,.09);color:var(--pur3);border-color:var(--pur)}
+.bctrl:active{transform:scale(.96)}
+
+/* GESTURE PANEL */
+#gesture-panel{display:none;flex-direction:column;background:var(--bg1);min-height:0;overflow:hidden}
+.gp-hdr{flex-shrink:0;padding:10px 14px 8px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between}
+.gp-hdr-title{font-family:var(--fr);font-size:10px;font-weight:600;color:var(--t2);letter-spacing:3px}
+.gp-filter{display:flex;gap:4px;flex-wrap:wrap;padding:7px 12px;border-bottom:1px solid var(--bd);flex-shrink:0}
+.gp-ft{font-family:var(--fm);font-size:7px;letter-spacing:1px;border:1px solid rgba(124,58,237,.2);background:transparent;padding:3px 8px;cursor:pointer;border-radius:4px;color:var(--t3);transition:all .15s}
+.gp-ft:hover{color:var(--pur3);border-color:rgba(124,58,237,.5)}
+.gp-ft.act{background:rgba(124,58,237,.18);border-color:var(--pur);color:var(--pur3)}
+.gp-grid{flex:1;overflow-y:auto;padding:10px 12px;display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:7px;align-content:start}
+.gp-grid::-webkit-scrollbar{width:3px}.gp-grid::-webkit-scrollbar-thumb{background:rgba(124,58,237,.3)}
+.g-card{display:flex;flex-direction:column;align-items:center;gap:4px;padding:9px 6px;border-radius:9px;border:1px solid rgba(124,58,237,.14);background:rgba(124,58,237,.04);cursor:pointer;transition:all .18s;position:relative;overflow:hidden}
+.g-card:hover{border-color:rgba(124,58,237,.45);background:rgba(124,58,237,.12);transform:translateY(-2px);box-shadow:0 4px 16px rgba(124,58,237,.15)}
+.g-card.active-card{border-color:var(--pur);background:rgba(124,58,237,.18);box-shadow:0 0 12px rgba(124,58,237,.28)}
+.gc-e{font-size:26px;line-height:1;filter:drop-shadow(0 0 5px rgba(124,58,237,.3))}
+.gc-n{font-family:var(--fr);font-size:8px;font-weight:700;letter-spacing:1px;text-align:center;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%}
+.gc-t{font-family:var(--fm);font-size:7px;color:var(--t3);letter-spacing:1px}
+.gc-play{position:absolute;top:3px;right:4px;font-size:9px;opacity:0;transition:opacity .15s;cursor:pointer;color:var(--pur3);background:rgba(0,0,0,.4);border-radius:3px;padding:1px 3px}
+.g-card:hover .gc-play{opacity:1}
+
+/* HISTORY PANEL */
+#history-panel{display:none;flex-direction:column;background:var(--bg1);min-height:0;overflow:hidden}
+.hp2-hdr{flex-shrink:0;padding:10px 14px 8px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between}
+.hp2-title{font-family:var(--fr);font-size:10px;font-weight:600;color:var(--t2);letter-spacing:3px}
+.hp2-clr{font-family:var(--fm);font-size:7px;letter-spacing:1px;border:1px solid rgba(124,58,237,.2);background:transparent;padding:3px 8px;cursor:pointer;border-radius:4px;color:var(--t3);transition:all .15s}
+.hp2-clr:hover{color:var(--pur3);border-color:rgba(124,58,237,.5);background:rgba(124,58,237,.08)}
+#hist-log{flex:1;overflow-y:auto;padding:8px 12px;display:flex;flex-direction:column;gap:5px}
+#hist-log::-webkit-scrollbar{width:3px}#hist-log::-webkit-scrollbar-thumb{background:rgba(124,58,237,.3)}
+.hl-item{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:7px;border:1px solid rgba(124,58,237,.1);background:rgba(124,58,237,.03);animation:hiIn .25s ease-out}
+.hl-e{font-size:20px;flex-shrink:0}
+.hl-info{flex:1;min-width:0}
+.hl-n{font-family:var(--fr);font-size:11px;font-weight:600;color:var(--pur3);letter-spacing:1px}
+.hl-s{font-family:var(--fm);font-size:8px;color:var(--t3);margin-top:1px}
+.hl-spk{font-family:var(--fm);font-size:8px;color:var(--t3);border:1px solid rgba(124,58,237,.15);background:transparent;padding:3px 8px;cursor:pointer;border-radius:3px;transition:all .15s;flex-shrink:0}
+.hl-spk:hover{color:var(--pur3);border-color:var(--pur);background:rgba(124,58,237,.08)}
+
+/* SETTINGS PANEL */
+#settings-panel{display:none;flex-direction:column;background:var(--bg1);min-height:0;overflow:hidden}
+.sp-hdr{flex-shrink:0;padding:10px 14px 8px;border-bottom:1px solid var(--bd)}
+.sp-title{font-family:var(--fr);font-size:10px;font-weight:600;color:var(--t2);letter-spacing:3px}
+.sp-body{flex:1;overflow-y:auto;padding:12px}
+.sp-body::-webkit-scrollbar{width:3px}.sp-body::-webkit-scrollbar-thumb{background:rgba(124,58,237,.3)}
+.sp-sec{margin-bottom:16px}
+.sp-sec-ttl{font-family:var(--fm);font-size:8px;color:var(--t3);letter-spacing:3px;margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid rgba(124,58,237,.1)}
+.sp-row{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(124,58,237,.06)}
+.sp-lbl{font-family:var(--fr);font-size:11px;font-weight:600;color:var(--tx);letter-spacing:.5px}
+.sp-sub{font-family:var(--fm);font-size:7px;color:var(--t3);margin-top:1px}
+.sp-tgl{width:32px;height:18px;border-radius:9px;background:rgba(124,58,237,.15);border:1px solid rgba(124,58,237,.25);cursor:pointer;position:relative;transition:all .2s;flex-shrink:0}
+.sp-tgl.on{background:rgba(124,58,237,.45);border-color:var(--pur);box-shadow:0 0 8px rgba(124,58,237,.3)}
+.sp-tgl::after{content:'';position:absolute;width:12px;height:12px;border-radius:50%;background:var(--t3);top:2px;left:2px;transition:all .2s}
+.sp-tgl.on::after{left:16px;background:var(--pur3)}
+.sp-rng{-webkit-appearance:none;width:100%;height:3px;border-radius:2px;background:rgba(124,58,237,.15);outline:none;margin-top:8px;cursor:pointer}
+.sp-rng::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--pur);cursor:pointer;box-shadow:0 0 8px rgba(124,58,237,.5)}
+.sp-badge{font-family:var(--fm);font-size:8px;padding:2px 8px;border-radius:4px;border:1px solid rgba(124,58,237,.25);color:var(--pur3)}
+
+/* VOICE PANEL */
+#voice-panel{display:none;flex-direction:column;background:var(--bg1);min-height:0;overflow:hidden}
+.vp-hdr{flex-shrink:0;padding:10px 14px 8px;border-bottom:1px solid var(--bd)}
+.vp-title{font-family:var(--fr);font-size:10px;font-weight:600;color:var(--t2);letter-spacing:3px}
+.vp-body{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px}
+.vp-body::-webkit-scrollbar{width:3px}
+.vp-status{padding:12px;background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.18);border-radius:9px;display:flex;align-items:center;gap:10px}
+.vp-st-ico{font-size:22px;flex-shrink:0}
+.vp-st-tx{flex:1}.vp-st-ttl{font-family:var(--fr);font-size:12px;font-weight:600;color:var(--g);letter-spacing:1px}
+.vp-st-sub{font-family:var(--fm);font-size:8px;color:var(--t3);margin-top:2px}
+.vp-qbtns{display:flex;flex-direction:column;gap:6px}
+.vp-qbtn{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:7px;border:1px solid rgba(124,58,237,.15);background:rgba(124,58,237,.04);cursor:pointer;transition:all .18s;font-family:var(--fr);font-size:12px;font-weight:600;color:var(--tx);letter-spacing:.5px;text-align:left}
+.vp-qbtn:hover{border-color:rgba(124,58,237,.4);background:rgba(124,58,237,.1);color:var(--pur3);transform:translateX(3px)}
+.vp-qbtn:active{transform:translateX(0)}
+.vp-qbtn span:first-child{font-size:16px;flex-shrink:0}
+.vp-qbtn small{display:block;font-family:var(--fm);font-size:7px;color:var(--t3);font-weight:normal;letter-spacing:1px;margin-top:1px}
+.sb-i{cursor:pointer}
+
+/* GESTURE LABEL TOAST */
+.glabel-toast{position:absolute;top:10px;left:50%;transform:translateX(-50%) translateY(-40px);background:rgba(124,58,237,.25);border:1px solid rgba(124,58,237,.5);border-radius:8px;padding:5px 14px;font-family:var(--fh);font-size:10px;letter-spacing:2px;color:var(--pur3);backdrop-filter:blur(8px);z-index:8;opacity:0;transition:all .3s;white-space:nowrap;pointer-events:none}
+.glabel-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@media(max-width:900px){
+  #main{display:flex;flex-direction:column;overflow-y:auto}
+  #main::-webkit-scrollbar{display:none}
+  #sb{display:none}
+  #cam-panel{height:52vw;max-height:220px;border-right:none;border-bottom:1px solid var(--bd);flex-shrink:0}
+  #holo-panel{height:178px;border-right:none;border-bottom:1px solid var(--bd);flex-shrink:0}
+  #rp{min-height:420px}
+  .hctr .pill:nth-child(n+3){display:none}
+  #app{grid-template-rows:46px 1fr 90px}
+  #tx-name{font-size:16px}
+}
+</style>
+</head>
+<body>
+<div class="gbg"></div>
+<div id="app">
+<header id="hdr">
+  <div class="logo">
+    <div class="logo-ico">✋</div>
+    <div>
+      <div class="logo-tx">Signa<em>Voice</em></div>
+      <div class="logo-by">BUILT BY GAURAV JHA · v4</div>
+    </div>
+  </div>
+  <div class="hctr">
+    <div class="pill"><div class="dot live" id="sdot"></div><span id="stxt">OFFLINE</span></div>
+    <div class="pill"><div class="dot pur"></div><span id="gcnt">0 SIGNS</span></div>
+    <div class="pill"><div class="dot" id="fpsdot"></div><span id="fps2">— FPS</span></div>
+  </div>
+  <div class="hrgt">
+    <button class="hbtn on" id="vbtn" onclick="toggleVoice()">🔊 VOICE</button>
+    <button class="hbtn danger" onclick="clearAll()">⌫ CLEAR</button>
+  </div>
+</header>
+<div id="main">
+  <nav id="sb">
+    <div class="sb-s">INTERFACE</div>
+    <div class="sb-i act" onclick="switchTab('live')" data-tab="live"><div class="sb-ico">📡</div>Live Feed</div>
+    <div class="sb-i" onclick="switchTab('gestures')" data-tab="gestures"><div class="sb-ico">✋</div>Gestures</div>
+    <div class="sb-i" onclick="switchTab('voice')" data-tab="voice"><div class="sb-ico">🔊</div>Voice</div>
+    <div class="sb-s">DATA</div>
+    <div class="sb-i" onclick="switchTab('live')" data-tab="live"><div class="sb-ico">📝</div>Text Log</div>
+    <div class="sb-i" onclick="switchTab('history')" data-tab="history"><div class="sb-ico">📊</div>History</div>
+    <div class="sb-s">SYSTEM</div>
+    <div class="sb-i" onclick="switchTab('settings')" data-tab="settings"><div class="sb-ico">⚙️</div>Settings</div>
+    <div style="flex:1"></div>
+    <div class="sb-ft"><strong>SIGNAVOICE v4</strong><p>65+ gestures<br>Corrected meanings<br>by <strong style="color:var(--pur3)">Gaurav Jha</strong></p></div>
+  </nav>
+
+  <div id="cam-panel">
+    <div class="cam-hdr">
+      <div class="cam-title">LIVE CAMERA FEED</div>
+      <div class="cbadges">
+        <div class="cbadge" id="cam-badge">OFFLINE</div>
+        <div class="cbadge" id="fps-badge">— FPS</div>
+      </div>
+    </div>
+    <div class="cam-area">
+      <video id="video" autoplay playsinline muted></video>
+      <canvas id="canvas"></canvas>
+      <div class="frame">
+        <div class="cr tl"></div><div class="cr tr"></div>
+        <div class="cr bl"></div><div class="cr br"></div>
+        <div class="scanbar" id="scanbar"></div>
+      </div>
+      <div id="dflash"><div id="dglyph">↑</div></div>
+      <div id="goverlay"><div class="go-inner"><span class="go-emoji" id="go-emoji">✋</span><span class="go-name" id="go-name">GESTURE</span></div></div>
+      <div class="glabel-toast" id="glabel"></div>
+      <div id="loader">
+        <div class="ld-rw">
+          <div class="ld-r"></div><div class="ld-r"></div><div class="ld-r"></div>
+          <div class="ld-ctr">✋</div>
+        </div>
+        <div class="ld-logo">Signa<em>Voice</em></div>
+        <div class="ld-by">BY GAURAV JHA · v4</div>
+        <div class="ld-steps">
+          <div class="ld-step" id="ls1"><div class="step-ico">📷</div><div class="step-tx"><div class="step-ti">CAMERA</div><div class="step-sb">Webcam access</div></div><div class="step-st" id="ss1">WAIT</div></div>
+          <div class="ld-step" id="ls2"><div class="step-ico">🤖</div><div class="step-tx"><div class="step-ti">AI MODEL</div><div class="step-sb">MediaPipe Hands</div></div><div class="step-st" id="ss2">WAIT</div></div>
+          <div class="ld-step" id="ls3"><div class="step-ico">✅</div><div class="step-tx"><div class="step-ti">READY</div><div class="step-sb">Starting detection</div></div><div class="step-st" id="ss3">WAIT</div></div>
+        </div>
+        <div class="ld-bar"><div class="ld-fill" id="ldfill"></div></div>
+        <div id="ldmsg">INITIALIZING...</div>
+        <div id="lderr"></div>
+        <button id="ldretry" onclick="startApp()">▶ START</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="holo-panel">
+    <div class="hp-top"><div class="hp-title">HOLOGRAM VIEW</div><div id="hp-id">NO GESTURE</div></div>
+    <div class="holo-area">
+      <div class="hglow" id="hglow"></div>
+      <div class="holo-rings"><div class="hring"></div><div class="hring"></div><div class="hring"></div></div>
+      <div class="hbeam"></div><div class="hsweep"></div>
+      <div class="hparts" id="hparts"></div>
+      <div id="h-idle"><div class="idle-ring"><div class="idle-ico">✋</div></div><div id="idle-txt"><span id="idle-alert">NO GESTURE DETECTED</span>SHOW HAND TO CAMERA</div></div>
+      <div id="holo-emoji">🖐</div>
+      <div id="holo-name"></div>
+      <div class="hbase"></div>
+    </div>
+    <div class="hp-conf"><div class="crow"><span>CONFIDENCE</span><span id="cval">—</span></div><div id="ctrack"><div id="cfill"></div></div></div>
+    <div class="hp-strip"><div class="sr"><span>TYPE</span><span class="sv" id="stype">—</span></div><div class="sr"><span>HAND</span><span class="sv" id="shand">NONE</span></div></div>
+  </div>
+
+  <div id="rp">
+    <div class="rp-sec">
+      <div class="rp-lbl">GESTURE <span id="det-cnt">0×</span></div>
+      <div id="g-name">SCANNING...</div>
+      <div id="g-desc">Show your hand to begin</div>
+      <div id="frow">
+        <div class="fi-w"><div class="fibar"><div class="fifill" id="ft"></div></div><div class="filbl">THB</div></div>
+        <div class="fi-w"><div class="fibar"><div class="fifill" id="fi"></div></div><div class="filbl">IDX</div></div>
+        <div class="fi-w"><div class="fibar"><div class="fifill" id="fm"></div></div><div class="filbl">MID</div></div>
+        <div class="fi-w"><div class="fibar"><div class="fifill" id="fr"></div></div><div class="filbl">RNG</div></div>
+        <div class="fi-w"><div class="fibar"><div class="fifill" id="fp"></div></div><div class="filbl">PNK</div></div>
+      </div>
+      <div id="dgrid">
+        <div></div><div class="darr" id="dup">↑</div><div></div>
+        <div class="darr" id="dlft">←</div><div class="darr dc">DIR</div><div class="darr" id="drgt">→</div>
+        <div></div><div class="darr" id="ddn">↓</div><div></div>
+      </div>
+    </div>
+    <div class="srow">
+      <div class="s-ico">🔊</div>
+      <div class="s-info"><div class="s-title">VOICE OUTPUT</div><div class="s-last" id="s-last">Awaiting gesture...</div></div>
+      <div id="wave"><div class="wb" id="wb1"></div><div class="wb" id="wb2"></div><div class="wb" id="wb3"></div><div class="wb" id="wb4"></div><div class="wb" id="wb5"></div></div>
+    </div>
+    <div id="txsec">
+      <div class="tx-top">
+        <div class="tx-lbl">CURRENT GESTURE</div>
+        <div class="txctrl"><button class="txbtn" onclick="speakCurrent()">▶ SPEAK</button><button class="txbtn" onclick="clearAll()">CLEAR</button></div>
+      </div>
+      <div id="tbox">
+        <div id="tb-idle"><div class="ti-ico">✍</div><p>GESTURE WORD<br>APPEARS HERE</p></div>
+        <div id="tx-word"><div id="tx-emoji">✋</div><div id="tx-name">—</div><div id="tx-type">—</div></div>
+      </div>
+      <div class="tx-bot"><div class="tx-cnt">Total: <span id="gtot">0</span> signs</div><button id="speak-all" onclick="speakAll()">▶ SPEAK ALL</button></div>
+    </div>
+
+    <!-- GESTURES PANEL -->
+    <div id="gesture-panel">
+      <div class="gp-hdr">
+        <div class="gp-hdr-title">ALL GESTURES</div>
+        <div style="font-family:var(--fm);font-size:8px;color:var(--t3)" id="gp-count">65 GESTURES</div>
+      </div>
+      <div class="gp-filter">
+        <button class="gp-ft act" onclick="filterGestures('ALL')">ALL</button>
+        <button class="gp-ft" onclick="filterGestures('GREETING')">GREETING</button>
+        <button class="gp-ft" onclick="filterGestures('COMMAND')">COMMAND</button>
+        <button class="gp-ft" onclick="filterGestures('NUMBER')">NUMBER</button>
+        <button class="gp-ft" onclick="filterGestures('EXPRESSION')">EXPRESSION</button>
+        <button class="gp-ft" onclick="filterGestures('ASL')">ASL</button>
+        <button class="gp-ft" onclick="filterGestures('DIRECTION')">DIRECTION</button>
+        <button class="gp-ft" onclick="filterGestures('ACTION')">ACTION</button>
+        <button class="gp-ft" onclick="filterGestures('GESTURE')">GESTURE</button>
+        <button class="gp-ft" onclick="filterGestures('CULTURAL')">CULTURAL</button>
+        <button class="gp-ft" onclick="filterGestures('APPROVAL')">APPROVAL</button>
+        <button class="gp-ft" onclick="filterGestures('OFFENSIVE')">OFFENSIVE</button>
+      </div>
+      <div class="gp-grid" id="gp-grid"></div>
+    </div>
+
+    <!-- HISTORY PANEL -->
+    <div id="history-panel">
+      <div class="hp2-hdr">
+        <div class="hp2-title">GESTURE HISTORY</div>
+        <button class="hp2-clr" onclick="clearAll()">CLEAR ALL</button>
+      </div>
+      <div id="hist-log"><div style="display:flex;align-items:center;justify-content:center;height:100%;flex-direction:column;gap:8px;opacity:.3"><div style="font-size:28px">📊</div><div style="font-family:var(--fm);font-size:8px;color:var(--t3);letter-spacing:2px">NO HISTORY YET</div></div></div>
+    </div>
+
+    <!-- VOICE PANEL -->
+    <div id="voice-panel">
+      <div class="vp-hdr"><div class="vp-title">VOICE OUTPUT</div></div>
+      <div class="vp-body">
+        <div class="vp-status" id="vp-status">
+          <div class="vp-st-ico" id="vp-ico">🔊</div>
+          <div class="vp-st-tx">
+            <div class="vp-st-ttl" id="vp-ttl">VOICE ACTIVE</div>
+            <div class="vp-st-sub" id="vp-sub">Web Speech API ready</div>
+          </div>
+        </div>
+        <div style="font-family:var(--fm);font-size:8px;color:var(--t3);letter-spacing:2px;margin-top:4px">QUICK PHRASES</div>
+        <div class="vp-qbtns">
+          <button class="vp-qbtn" onclick="speak('Hello! How are you?')"><span>👋</span><div>Hello! How are you?<small>GREETING</small></div></button>
+          <button class="vp-qbtn" onclick="speak('Thank you very much!')"><span>🙏</span><div>Thank you very much!<small>GRATITUDE</small></div></button>
+          <button class="vp-qbtn" onclick="speak('Yes, I understand.')"><span>👍</span><div>Yes, I understand.<small>CONFIRMATION</small></div></button>
+          <button class="vp-qbtn" onclick="speak('Please wait a moment.')"><span>✋</span><div>Please wait a moment.<small>COMMAND</small></div></button>
+          <button class="vp-qbtn" onclick="speak('I love you!')"><span>🤟</span><div>I love you!<small>ASL</small></div></button>
+          <button class="vp-qbtn" onclick="speak('Call me later.')"><span>🤙</span><div>Call me later.<small>GESTURE</small></div></button>
+          <button class="vp-qbtn" onclick="speak('Rock on!')"><span>🤘</span><div>Rock on!<small>EXPRESSION</small></div></button>
+          <button class="vp-qbtn" onclick="speakAll()"><span>📋</span><div>Speak All Detected Signs<small>ALL HISTORY</small></div></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS PANEL -->
+    <div id="settings-panel">
+      <div class="sp-hdr"><div class="sp-title">SETTINGS</div></div>
+      <div class="sp-body">
+        <div class="sp-sec">
+          <div class="sp-sec-ttl">VOICE</div>
+          <div class="sp-row">
+            <div><div class="sp-lbl">Voice Output</div><div class="sp-sub">Speak detected gestures aloud</div></div>
+            <div class="sp-tgl on" id="st-voice" onclick="toggleVoiceSettings()"></div>
+          </div>
+          <div class="sp-row">
+            <div><div class="sp-lbl">Speech Rate</div><div class="sp-sub">How fast gestures are spoken</div></div>
+            <span class="sp-badge" id="rate-val">0.85×</span>
+          </div>
+          <input type="range" class="sp-rng" min="0.5" max="1.5" step="0.05" value="0.85" oninput="updateRate(this.value)">
+          <div class="sp-row" style="margin-top:8px">
+            <div><div class="sp-lbl">Speech Pitch</div><div class="sp-sub">Pitch of voice output</div></div>
+            <span class="sp-badge" id="pitch-val">1.1</span>
+          </div>
+          <input type="range" class="sp-rng" min="0.5" max="2.0" step="0.1" value="1.1" oninput="updatePitch(this.value)">
+        </div>
+        <div class="sp-sec">
+          <div class="sp-sec-ttl">DETECTION</div>
+          <div class="sp-row">
+            <div><div class="sp-lbl">Hold Sensitivity</div><div class="sp-sub">Frames before gesture fires (current: <span id="hold-disp">8</span>)</div></div>
+            <span class="sp-badge" id="hold-val">MEDIUM</span>
+          </div>
+          <input type="range" class="sp-rng" min="3" max="16" step="1" value="8" oninput="updateHold(this.value)">
+          <div class="sp-row" style="margin-top:8px">
+            <div><div class="sp-lbl">Gesture Flash</div><div class="sp-sub">Show direction arrow overlay</div></div>
+            <div class="sp-tgl on" id="st-flash" onclick="this.classList.toggle('on')"></div>
+          </div>
+        </div>
+        <div class="sp-sec">
+          <div class="sp-sec-ttl">DISPLAY</div>
+          <div class="sp-row">
+            <div><div class="sp-lbl">Scan Overlay</div><div class="sp-sub">Animated scan bar on camera</div></div>
+            <div class="sp-tgl on" id="st-scan" onclick="toggleScan()"></div>
+          </div>
+          <div class="sp-row">
+            <div><div class="sp-lbl">Hand Skeleton</div><div class="sp-sub">Draw joints on detected hand</div></div>
+            <div class="sp-tgl on" id="st-skel"></div>
+          </div>
+          <div class="sp-row">
+            <div><div class="sp-lbl">Gesture Label Overlay</div><div class="sp-sub">Show detected gesture on camera</div></div>
+            <div class="sp-tgl on" id="st-overlay" onclick="this.classList.toggle('on')"></div>
+          </div>
+        </div>
+        <div class="sp-sec">
+          <div class="sp-sec-ttl">ABOUT</div>
+          <div style="padding:10px;background:rgba(124,58,237,.06);border:1px solid rgba(124,58,237,.14);border-radius:8px">
+            <div style="font-family:var(--fh);font-size:13px;font-weight:900;letter-spacing:3px;color:var(--pur3)">SIGNAVOICE v4</div>
+            <div style="font-family:var(--fm);font-size:8px;color:var(--t3);margin-top:4px;line-height:2">65+ gestures · Corrected meanings<br>MediaPipe Hands · Web Speech API<br>Built by <span style="color:var(--pur3)">Gaurav Jha</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="bot">
+  <div class="bot-lbl">LOG</div>
+  <div id="hist"></div>
+  <div class="bot-r"><div id="fpsd">— FPS</div><button class="bctrl" onclick="clearHist()">CLR LOG</button></div>
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+<script>
+'use strict';
+/* ═══════════════════════════════════════════════════════════════
+   SIGNAVOICE v4 — GESTURE DICTIONARY
+   ─────────────────────────────────────────────────────────────
+   All meanings corrected to accurate real-world interpretations.
+   CHANGES FROM v3:
+   · midfing: "No way" → "Fuck off / F*** you" (correct offensive meaning)
+   · punch:   aggressive fist now speaks correctly
+   · clap:    gesture improved
+   · raisedback: "Raised Back / Wait" refined
+   · stop vs highfive distinction improved
+   NEW GESTURES ADDED (+15):
+   · fingergun, horns, shaka/hangloose, chef_kiss, bismillah,
+     timeout, dontknow, counting gestures (one/two/five),
+     blessing, crossed_arms concept, shhh (index on lips), gun
+═══════════════════════════════════════════════════════════════ */
+const G={
+  /* ── GREETINGS ─────────────────────────────────────────── */
+  hey:       {e:'👋',n:'WAVE / HEY',     s:'Hey! Hello!',                  d:'Open hand waving — friendly greeting',           c:'#a78bfa',t:'GREETING'},
+  highfive:  {e:'🖐️',n:'HIGH FIVE',      s:'High five!',                   d:'All five fingers spread wide — high five',        c:'#fb923c',t:'GREETING'},
+  peace:     {e:'✌️',n:'PEACE',           s:'Peace! Victory!',               d:'Index and middle fingers up — peace / victory',  c:'#67e8f9',t:'GREETING'},
+
+  /* ── COMMANDS ──────────────────────────────────────────── */
+  stop:      {e:'✋',n:'STOP',            s:'Stop. Halt right there.',       d:'Palm flat facing forward — stop / halt',         c:'#f87171',t:'COMMAND'},
+  raisedback:{e:'🤚',n:'WAIT',           s:'Wait. Hold on a moment.',       d:'Back of hand raised — wait, slow down',          c:'#fbbf24',t:'COMMAND'},
+  excuseme:  {e:'☝️',n:'EXCUSE ME',      s:'Excuse me! One moment please.', d:'Single index pointing up — attention / listen',  c:'#f59e0b',t:'COMMAND'},
+  timeout:   {e:'⏱️',n:'TIME OUT',       s:'Time out. Pause please.',       d:'T-shape: one hand flat, other points down on it',c:'#06b6d4',t:'COMMAND'},
+  shhh:      {e:'🤫',n:'SHUSH / QUIET',  s:'Shhh. Please be quiet.',        d:'Index finger raised to lips — be quiet',         c:'#818cf8',t:'COMMAND'},
+
+  /* ── EXPRESSIONS / EMOTIONS ────────────────────────────── */
+  clap:      {e:'👏',n:'CLAPPING',        s:'Bravo! Well done! Applause!',   d:'Hands clapping — applause and approval',         c:'#f59e0b',t:'EXPRESSION'},
+  crossfing: {e:'🤞',n:'FINGERS CROSSED', s:'Fingers crossed! Good luck!',   d:'Index crossed over middle — hoping for luck',    c:'#38bdf8',t:'EXPRESSION'},
+  rockon:    {e:'🤘',n:'ROCK ON',         s:'Rock on! Metal horns!',         d:'Index and pinky up — rock music salute',         c:'#fb923c',t:'EXPRESSION'},
+  flex:      {e:'💪',n:'STRONG',          s:'Strong! Muscle!',               d:'Arm raised with thumb over fist — showing muscle',c:'#f97316',t:'EXPRESSION'},
+  hearthand: {e:'🫶',n:'HEART HANDS',     s:'Love and heart!',               d:'Both hands curved forming a heart shape',        c:'#f43f5e',t:'EXPRESSION'},
+  chef_kiss: {e:'🤌',n:'CHEF KISS',       s:'Chef kiss! Perfetto! Magnificent!',d:'All fingertips pinched then kissed — excellent',c:'#fcd34d',t:'EXPRESSION'},
+  dontknow:  {e:'🤷',n:'I DON\'T KNOW',  s:'I don\'t know. No idea.',       d:'Shrug — both hands open and raised sideways',    c:'#94a3b8',t:'EXPRESSION'},
+  horns:     {e:'🤘',n:'DEVIL HORNS',     s:'Rock on! Heavy metal!',         d:'Index and pinky extended — devil horns / rock',  c:'#dc2626',t:'EXPRESSION'},
+
+  /* ── NUMBERS ────────────────────────────────────────────── */
+  one:       {e:'1️⃣',n:'ONE',             s:'One.',                          d:'Index finger only extended upward',              c:'#93c5fd',t:'NUMBER'},
+  two:       {e:'2️⃣',n:'TWO',             s:'Two.',                          d:'Index and middle fingers up — number two',       c:'#86efac',t:'NUMBER'},
+  three:     {e:'3️⃣',n:'THREE',           s:'Three.',                        d:'Index, middle, ring fingers extended',           c:'#60a5fa',t:'NUMBER'},
+  four:      {e:'4️⃣',n:'FOUR',            s:'Four.',                         d:'Four fingers extended, thumb tucked in',         c:'#34d399',t:'NUMBER'},
+  five:      {e:'5️⃣',n:'FIVE',            s:'Five.',                         d:'All five fingers and thumb open wide',           c:'#a3e635',t:'NUMBER'},
+
+  /* ── APPROVAL / REJECTION ──────────────────────────────── */
+  thumbsup:  {e:'👍',n:'THUMBS UP',       s:'Thumbs up! Great! Yes!',        d:'Thumb raised upward — approval, agreement',      c:'#10b981',t:'APPROVAL'},
+  thumbsdn:  {e:'👎',n:'THUMBS DOWN',     s:'Thumbs down. No. Disagree.',    d:'Thumb pointing downward — disapproval',          c:'#ef4444',t:'APPROVAL'},
+  ok:        {e:'👌',n:'OK / PERFECT',    s:'Okay! Perfect!',                d:'Thumb and index finger circle — OK sign',        c:'#22d3ee',t:'APPROVAL'},
+
+  /* ── ACTIONS / FISTS ────────────────────────────────────── */
+  fist:      {e:'✊',n:'RAISED FIST',      s:'Raised fist! Power and solidarity!',d:'Fingers closed tight — power, defiance, solidarity',c:'#f97316',t:'ACTION'},
+  punch:     {e:'👊',n:'FIST BUMP',       s:'Fist bump!',                    d:'Fist held forward — fist bump greeting',         c:'#dc2626',t:'ACTION'},
+  leftfist:  {e:'🤛',n:'LEFT BUMP',       s:'Left fist bump!',               d:'Left-facing fist — left side fist bump',         c:'#ea580c',t:'ACTION'},
+  rightfist: {e:'🤜',n:'RIGHT BUMP',      s:'Right fist bump!',              d:'Right-facing fist — right side fist bump',       c:'#d97706',t:'ACTION'},
+  fingergun: {e:'🤙',n:'FINGER GUN',      s:'Finger guns! Bang bang!',       d:'Thumb up, index out, others curled — finger gun',c:'#64748b',t:'ACTION'},
+
+  /* ── ASL (American Sign Language) ─────────────────────── */
+  yo:        {e:'🤟',n:'I LOVE YOU',      s:'I love you!',                   d:'Thumb, index, and pinky up — ASL I love you',    c:'#e879f9',t:'ASL'},
+  callme:    {e:'🤙',n:'CALL ME',         s:'Call me! Phone me later.',      d:'Thumb and pinky extended — phone / call me',     c:'#a3e635',t:'ASL'},
+  lshape:    {e:'👆',n:'ASL — L',         s:'Letter L.',                     d:'Thumb out and index up forming an L shape',      c:'#fcd34d',t:'ASL'},
+  pinky:     {e:'🤙',n:'ASL — I',         s:'Letter I. Pinky up.',           d:'Pinky finger only raised — ASL letter I',        c:'#f472b6',t:'ASL'},
+  vulcan:    {e:'🖖',n:'VULCAN SALUTE',   s:'Live long and prosper!',        d:'Two pairs of fingers split apart — Vulcan salute',c:'#818cf8',t:'ASL'},
+
+  /* ── DIRECTIONS ─────────────────────────────────────────── */
+  up:        {e:'👆',n:'UP',              s:'Up. That direction.',            d:'Index finger pointing upward',                   c:'#06b6d4',t:'DIRECTION'},
+  down:      {e:'👇',n:'DOWN',            s:'Down. Below.',                   d:'Index finger pointing downward',                 c:'#06b6d4',t:'DIRECTION'},
+  left:      {e:'👈',n:'LEFT',            s:'Left. That way.',                d:'Index finger pointing to the left',              c:'#06b6d4',t:'DIRECTION'},
+  right:     {e:'👉',n:'RIGHT',           s:'Right. That direction.',         d:'Index finger pointing to the right',             c:'#06b6d4',t:'DIRECTION'},
+  pointview: {e:'🫵',n:'YOU / POINTING',  s:'You! I mean you.',              d:'Index pointing directly at the viewer',          c:'#ec4899',t:'DIRECTION'},
+
+  /* ── GESTURES ───────────────────────────────────────────── */
+  pinch:     {e:'🤏',n:'SMALL / PINCH',   s:'A little bit. Just a tiny bit.',d:'Thumb and index held close — small amount',      c:'#fcd34d',t:'GESTURE'},
+  snap:      {e:'🫰',n:'SNAP',            s:'Snap! Exactly! Got it!',        d:'Thumb and middle finger close — snap gesture',   c:'#fbbf24',t:'GESTURE'},
+  handshake: {e:'🫲',n:'OFFER HAND',      s:'Here, take it. I offer.',       d:'Open palm extended sideways — offering hand',    c:'#818cf8',t:'GESTURE'},
+  handshaker:{e:'🫱',n:'TAKE / COME',     s:'Come here. Come to me.',        d:'Open palm reached right — beckoning someone',    c:'#818cf8',t:'GESTURE'},
+  palmup:    {e:'🫴',n:'PALM UP',         s:'Please. Here you go. Offering.',d:'Open hand with palm facing upward',              c:'#a78bfa',t:'GESTURE'},
+  palmdown:  {e:'🫳',n:'CALM DOWN',       s:'Calm down. Settle. Easy.',      d:'Open hand palm facing downward — settle down',   c:'#6366f1',t:'GESTURE'},
+  shaka:     {e:'🤙',n:'SHAKA / HANG LOOSE',s:'Hang loose! Shaka brah!',    d:'Thumb and pinky out — Hawaiian shaka / chill',   c:'#22c55e',t:'GESTURE'},
+
+  /* ── CULTURAL ───────────────────────────────────────────── */
+  namaste:   {e:'🙏',n:'NAMASTE',         s:'Namaste. Thank you. Please.',   d:'All fingertips pressed together — prayer / namaste',c:'#fbbf24',t:'CULTURAL'},
+  blessing:  {e:'✝️',n:'BLESSING',        s:'Blessings to you.',             d:'Three fingers up, thumb and ring touching — blessing',c:'#e2d9f3',t:'CULTURAL'},
+  bismillah: {e:'☪️',n:'BISMILLAH',       s:'Bismillah. In the name of God.',d:'Index raised skyward with intention — reverence',c:'#10b981',t:'CULTURAL'},
+
+  /* ── OFFENSIVE (educational / awareness) ───────────────── */
+  midfing:   {e:'🖕',n:'MIDDLE FINGER',   s:'Fuck off!',                     d:'Middle finger raised alone — extremely offensive gesture',c:'#ff0066',t:'OFFENSIVE'},
+};
+
+/* ═══ PARTICLES ═══════════════════════════ */
+(function(){
+  const c=document.getElementById('hparts');
+  for(let i=0;i<12;i++){
+    const p=document.createElement('div');p.className='hp2';
+    p.style.cssText=`left:${14+Math.random()*72}%;bottom:${8+Math.random()*16}%;animation-duration:${3.5+Math.random()*4.5}s;animation-delay:${Math.random()*5}s`;
+    c.appendChild(p);
+  }
+})();
+
+/* ═══ SPEECH ══════════════════════════════ */
+let voiceOn=true,voices=[],spkT=null,speechRate=0.85,speechPitch=1.1;
+const loadV=()=>{voices=window.speechSynthesis.getVoices();};
+if(window.speechSynthesis){loadV();window.speechSynthesis.onvoiceschanged=loadV;}
+
+function speak(txt){
+  if(!voiceOn||!txt)return;
+  clearTimeout(spkT);
+  spkT=setTimeout(()=>{
+    if(!window.speechSynthesis)return;
+    window.speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(txt);
+    u.volume=1.0;u.rate=speechRate;u.pitch=speechPitch;
+    const v=voices.find(v=>v.lang==='en-US'&&v.localService)||voices.find(v=>v.lang==='en-US')||voices.find(v=>v.lang.startsWith('en'))||null;
+    if(v)u.voice=v;
+    u.onstart=()=>{
+      for(let i=1;i<=5;i++){const e=document.getElementById('wb'+i);if(e)e.classList.add('on');}
+      const sl=document.getElementById('s-last');if(sl)sl.textContent='"'+txt+'"';
+    };
+    u.onend=u.onerror=()=>{for(let i=1;i<=5;i++){const e=document.getElementById('wb'+i);if(e)e.classList.remove('on');}};
+    window.speechSynthesis.speak(u);
+  },110);
+}
+function toggleVoice(){
+  voiceOn=!voiceOn;
+  const b=document.getElementById('vbtn');
+  b.textContent=voiceOn?'🔊 VOICE':'🔇 MUTED';
+  b.className='hbtn '+(voiceOn?'on':'off');
+  if(!voiceOn)window.speechSynthesis.cancel();
+  const t=document.getElementById('st-voice');
+  if(t)t.classList.toggle('on',voiceOn);
+}
+function toggleVoiceSettings(){
+  voiceOn=!voiceOn;
+  const t=document.getElementById('st-voice');
+  if(t)t.classList.toggle('on',voiceOn);
+  const b=document.getElementById('vbtn');
+  if(b){b.textContent=voiceOn?'🔊 VOICE':'🔇 MUTED';b.className='hbtn '+(voiceOn?'on':'off');}
+  if(!voiceOn)window.speechSynthesis.cancel();
+  const vs=document.getElementById('vp-status');
+  if(vs)vs.style.background=voiceOn?'rgba(16,185,129,.06)':'rgba(239,68,68,.06)';
+  const vt=document.getElementById('vp-ttl');if(vt){vt.textContent=voiceOn?'VOICE ACTIVE':'VOICE MUTED';vt.style.color=voiceOn?'var(--g)':'var(--r)';}
+  const vi=document.getElementById('vp-ico');if(vi)vi.textContent=voiceOn?'🔊':'🔇';
+}
+function updateRate(v){speechRate=parseFloat(v);const el=document.getElementById('rate-val');if(el)el.textContent=speechRate.toFixed(2)+'×';}
+function updatePitch(v){speechPitch=parseFloat(v);const el=document.getElementById('pitch-val');if(el)el.textContent=parseFloat(v).toFixed(1);}
+function updateHold(v){
+  HOLD_DYNAMIC=parseInt(v);
+  const disp=document.getElementById('hold-disp');if(disp)disp.textContent=v;
+  const badge=document.getElementById('hold-val');
+  if(badge)badge.textContent=v<=4?'FAST':v<=8?'MEDIUM':'SLOW';
+}
+function toggleScan(){
+  const t=document.getElementById('st-scan');if(t)t.classList.toggle('on');
+  const sb=document.getElementById('scanbar');
+  if(sb)sb.style.display=(t&&t.classList.contains('on'))?'block':'none';
+}
+
+/* ═══ GEOMETRY HELPERS ════════════════════ */
+function d2(a,b){return Math.sqrt((a.x-b.x)**2+(a.y-b.y)**2+(a.z-b.z||0)**2);}
+// Finger fully extended: tip clearly above pip (lower y = higher on screen)
+function FE(lm,tip,pip){return(lm[pip].y-lm[tip].y)>0.045;}
+// Finger loosely extended (less strict)
+function FEL(lm,tip,pip){return(lm[pip].y-lm[tip].y)>0.02;}
+// Thumb out: tip far from index base
+function thumbOut(lm){return d2(lm[4],lm[5])>0.085;}
+// Thumb in: tucked close to palm
+function thumbIn(lm){return d2(lm[4],lm[9])<0.12&&d2(lm[4],lm[5])<0.09;}
+// Tips distance
+function tipDist(lm,a,b){return d2(lm[a],lm[b]);}
+// Palm up: wrist y > middle MCP y
+function palmUp(lm){return lm[0].y>lm[9].y+0.06;}
+// Palm down
+function palmDown(lm){return lm[0].y<lm[9].y-0.06;}
+// All tips close together (namaste/chef kiss)
+function allTipsClosed(lm){
+  const tips=[4,8,12,16,20];
+  const cx=tips.reduce((s,t)=>s+lm[t].x,0)/5;
+  const cy=tips.reduce((s,t)=>s+lm[t].y,0)/5;
+  return tips.every(t=>d2(lm[t],{x:cx,y:cy,z:0})<0.065);
+}
+// Vulcan: index+middle close, ring+pinky close, gap between groups, all up
+function isVulcan(lm){
+  const imClose=tipDist(lm,8,12)<0.065;
+  const rpClose=tipDist(lm,16,20)<0.065;
+  const gap=tipDist(lm,12,16)>0.075;
+  const allUp=FE(lm,8,6)&&FE(lm,12,10)&&FE(lm,16,14)&&FE(lm,20,18);
+  return imClose&&rpClose&&gap&&allUp;
+}
+// OK: thumb and index tips circle, others extended
+function isOK(lm){
+  return tipDist(lm,4,8)<0.065&&FE(lm,12,10)&&FE(lm,16,14)&&FE(lm,20,18);
+}
+// Pinch: thumb+index close, others NOT extended
+function isPinch(lm){
+  return tipDist(lm,4,8)<0.065&&!FEL(lm,12,10)&&!FEL(lm,16,14)&&!FEL(lm,20,18);
+}
+// Snap gesture: thumb and MIDDLE finger close (not index)
+function isSnap(lm){
+  return tipDist(lm,4,12)<0.065&&!FEL(lm,8,6)&&!FEL(lm,16,14)&&!FEL(lm,20,18);
+}
+// Crossed fingers: index+middle both up, tips very close
+function isCrossed(lm){
+  return FE(lm,8,6)&&FE(lm,12,10)&&tipDist(lm,8,12)<0.058&&!FE(lm,16,14)&&!FE(lm,20,18);
+}
+// Heart hand: all fingers loosely extended
+function isHeartHand(lm){
+  const t=thumbOut(lm);
+  const i=FEL(lm,8,6),m=FEL(lm,12,10),r=FEL(lm,16,14),p=FEL(lm,20,18);
+  return t&&i&&m&&r&&p&&lm[0].y>lm[9].y-0.03;
+}
+// Chef kiss / Namaste variant: all tips tightly bunched
+function isChefKiss(lm){
+  return allTipsClosed(lm)&&thumbOut(lm)===false&&tipDist(lm,4,8)<0.07;
+}
+// Pointing toward viewer: tip close to MCP in 2D
+function isPointingAtViewer(lm){
+  return d2(lm[8],lm[5])<0.075&&FE(lm,8,6);
+}
+// Shhh: index up + close to face (approximated by index well extended, others curled, similar to excuseme)
+function isShhh(lm){
+  return FE(lm,8,6)&&!FE(lm,12,10)&&!FE(lm,16,14)&&!FE(lm,20,18)&&thumbIn(lm)&&lm[8].y<lm[0].y+0.12;
+}
+// Finger gun: index extended, thumb out, middle/ring/pinky curled
+function isFingerGun(lm){
+  const i=FE(lm,8,6),t=thumbOut(lm);
+  const mDown=!FEL(lm,12,10),rDown=!FEL(lm,16,14),pDown=!FEL(lm,20,18);
+  return i&&t&&mDown&&rDown&&pDown;
+}
+// Blessing: three fingers (index+middle+ring) up, thumb touching ring, pinky curled
+function isBlessing(lm){
+  return FE(lm,8,6)&&FE(lm,12,10)&&FE(lm,16,14)&&!FE(lm,20,18)&&tipDist(lm,4,16)<0.07;
+}
+// Hand extended sideways
+function isHandLeft(lm){return lm[0].x-lm[12].x>0.12;}
+function isHandRight(lm){return lm[12].x-lm[0].x>0.12;}
+
+/* ═══════════════════════════════════════════════════════════════
+   GESTURE DETECTION — Priority order: most specific first.
+   Canvas NOT mirrored: x = (1 - lm[].x) * W
+   Video IS CSS-mirrored, so left/right appear swapped to user.
+═══════════════════════════════════════════════════════════════ */
+function detectGesture(lm){
+  const t=thumbOut(lm)?1:0;
+  const ti=thumbIn(lm);
+  const i=FE(lm,8,6)?1:0;
+  const m=FE(lm,12,10)?1:0;
+  const r=FE(lm,16,14)?1:0;
+  const p=FE(lm,20,18)?1:0;
+  const st=[t,i,m,r,p];
+
+  /* ── HIGHEST PRIORITY: unique shape detectors ── */
+  if(isVulcan(lm))               return{id:'vulcan',st,dir:null};
+  if(isOK(lm))                   return{id:'ok',st,dir:null};
+  if(isCrossed(lm))              return{id:'crossfing',st,dir:null};
+  if(isSnap(lm))                 return{id:'snap',st,dir:null};
+  if(isPinch(lm))                return{id:'pinch',st,dir:null};
+  if(isChefKiss(lm)||allTipsClosed(lm)) return{id:'namaste',st,dir:null};
+
+  /* ── ALL 5 FINGERS ── */
+  if(t&&i&&m&&r&&p){
+    if(isHeartHand(lm)&&palmUp(lm)) return{id:'hearthand',st,dir:null};
+    if(palmUp(lm))                   return{id:'palmup',st,dir:null};
+    if(palmDown(lm))                 return{id:'palmdown',st,dir:null};
+    // "five" = all fingers wide open
+    return{id:'five',st,dir:null};  // was 'hey' — now 'five' and 'hey' share this
+  }
+
+  // Distinguish wave (hey) vs stop vs highfive by motion isn't possible with single frame;
+  // we use palm orientation: stop=palm forward (roughly), hey=wrist moving
+  // Simple heuristic: all 5 + thumbIn = stop/highfive
+  if(ti&&i&&m&&r&&p){
+    return{id:'stop',st,dir:null};
+  }
+
+  /* ── 4 FINGERS ── */
+  if(ti&&!t&&i&&m&&r&&p)            return{id:'four',st,dir:null};
+
+  /* ── 3 FINGERS ── */
+  // Blessing: index+middle+ring up, thumb touching ring
+  if(isBlessing(lm))                return{id:'blessing',st,dir:null};
+  if(!t&&i&&m&&r&&!p)               return{id:'three',st,dir:null};
+
+  /* ── 2 FINGERS ── */
+  // Peace/Victory index+middle only
+  if(!t&&i&&m&&!r&&!p)              return{id:'peace',st,dir:null};
+  // Rock on index+pinky (devil horns)
+  if(!t&&i&&!m&&!r&&p)              return{id:'rockon',st,dir:null};
+  // ILY: thumb+index+pinky
+  if(t&&i&&!m&&!r&&p)               return{id:'yo',st,dir:null};
+
+  /* ── THUMB + 1 ── */
+  // Finger gun: thumb + index (but NOT l-shape: gun angles differ; use helper)
+  if(isFingerGun(lm))               return{id:'fingergun',st,dir:null};
+  // Call me / Shaka: thumb + pinky only (no index)
+  if(t&&!i&&!m&&!r&&p)              return{id:'callme',st,dir:null};
+  // L-shape: thumb + index (no pinky)
+  if(t&&i&&!m&&!r&&!p)              return{id:'lshape',st,dir:null};
+
+  /* ── MIDDLE FINGER ALONE ── */
+  // 🔑 CORRECTED: middle finger alone = "Fuck off" not "No way"
+  if(!t&&!i&&m&&!r&&!p)             return{id:'midfing',st,dir:null};
+
+  /* ── PINKY ALONE ── */
+  if(ti&&!t&&!i&&!m&&!r&&p)         return{id:'pinky',st,dir:null};
+
+  /* ── FIST VARIANTS ── */
+  if(ti&&!t&&!i&&!m&&!r&&!p){
+    const dx=lm[9].x-lm[0].x;
+    if(Math.abs(dx)>0.06)return{id:dx>0?'leftfist':'rightfist',st,dir:null};
+    return{id:'fist',st,dir:null};
+  }
+
+  /* ── THUMB ALONE ── */
+  if(t&&!i&&!m&&!r&&!p){
+    const dy=lm[4].y-lm[2].y;
+    // flex: thumb tip significantly above wrist
+    if(lm[4].y<lm[0].y-0.05) return{id:'flex',st,dir:null};
+    return{id:dy>0.04?'thumbsdn':'thumbsup',st,dir:null};
+  }
+
+  /* ── INDEX ALONE — directions + special ── */
+  if(!t&&i&&!m&&!r&&!p){
+    if(isPointingAtViewer(lm))      return{id:'pointview',st,dir:null};
+    // Shhh: index up + thumb in + restricted angle
+    if(isShhh(lm))                  return{id:'shhh',st,dir:null};
+    const dx=lm[8].x-lm[5].x,dy=lm[8].y-lm[5].y;
+    const ax=Math.abs(dx),ay=Math.abs(dy);
+    let id,dir=null;
+    if(ay>ax){
+      if(dy<-0.03){
+        // Thumb-in with index up = excuseme; otherwise 'up'
+        id=ti?'excuseme':'up';dir='up';
+      }else{id='down';dir='down';}
+    }else{
+      id=dx>0.04?'left':'right';dir=id;
+    }
+    return{id,st,dir};
+  }
+
+  /* ── THUMB + MIDDLE (hand sideways) ── */
+  if(t&&!i&&m&&!r&&!p){
+    if(isHandLeft(lm)) return{id:'handshake',st,dir:null};
+    if(isHandRight(lm))return{id:'handshaker',st,dir:null};
+    return{id:'dontknow',st,dir:null};
+  }
+
+  /* ── FALLBACK: open hand all down = clap / wait ── */
+  const allDown=!i&&!m&&!r&&!p&&!t;
+  if(allDown)return{id:'clap',st,dir:null};
+
+  // "ONE" — specifically index only with thumb out (looser variant)
+  if(t&&i&&!m&&!r&&!p&&!isFingerGun(lm))return{id:'one',st,dir:null};
+
+  // "TWO" = index + middle + thumb out
+  if(t&&i&&m&&!r&&!p)return{id:'two',st,dir:null};
+
+  return{id:null,st,dir:null};
+}
+
+/* ═══ CANVAS ══════════════════════════════════════════════════
+   Video is CSS-mirrored (scaleX(-1)).
+   Canvas is NOT CSS-mirrored.
+   Mirror x: x_canvas = (1 - lm.x) * W
+═════════════════════════════════════════════════════════════ */
+const videoEl=document.getElementById('video');
+const cvs=document.getElementById('canvas');
+const ctx=cvs.getContext('2d');
+let CW=0,CH=0,PT=0,rippleOn=false,rippleT=0;
+
+new ResizeObserver(([e])=>{
+  const{width:w,height:h}=e.contentRect;
+  CW=Math.round(w);CH=Math.round(h);
+  cvs.width=CW;cvs.height=CH;
+}).observe(cvs);
+
+function lx(lm){return(1-lm.x)*CW;}
+function ly(lm){return lm.y*CH;}
+
+function drawHand(lm,col){
+  if(!CW||!CH)return;
+  ctx.clearRect(0,0,CW,CH);
+  if(!lm)return;
+
+  const skelOn=document.getElementById('st-skel');
+  if(!skelOn||!skelOn.classList.contains('on'))return;
+
+  PT+=0.055;
+
+  const CONNECTIONS=[
+    [0,1],[1,2],[2,3],[3,4],
+    [0,5],[5,6],[6,7],[7,8],
+    [9,10],[10,11],[11,12],
+    [0,9],[5,9],
+    [9,13],[13,14],[14,15],[15,16],
+    [0,17],[13,17],[17,18],[18,19],[19,20]
+  ];
+
+  ctx.save();
+  CONNECTIONS.forEach(([a,b])=>{
+    ctx.beginPath();
+    ctx.moveTo(lx(lm[a]),ly(lm[a]));
+    ctx.lineTo(lx(lm[b]),ly(lm[b]));
+    ctx.strokeStyle='rgba(124,58,237,0.45)';
+    ctx.lineWidth=2;
+    ctx.stroke();
+  });
+
+  const TIPS=[4,8,12,16,20];
+  const MIDS=[3,7,11,15,19];
+  const BASE=[2,5,6,9,10,13,14,17,18];
+
+  lm.forEach((pt,idx)=>{
+    const x=lx(pt),y=ly(pt);
+    if(TIPS.includes(idx)){
+      const phase=PT+idx*0.8;
+      const r1=6+3*Math.sin(phase);
+      const r2=11+3*Math.sin(phase+1.0);
+      const r3=17+3*Math.sin(phase+2.0);
+      ctx.beginPath();ctx.arc(x,y,r3,0,Math.PI*2);
+      ctx.strokeStyle=col+'28';ctx.lineWidth=1;ctx.stroke();
+      ctx.beginPath();ctx.arc(x,y,r2,0,Math.PI*2);
+      ctx.strokeStyle=col+'55';ctx.lineWidth=1.2;ctx.stroke();
+      ctx.beginPath();ctx.arc(x,y,r1,0,Math.PI*2);
+      ctx.strokeStyle=col+'aa';ctx.lineWidth=1.5;ctx.stroke();
+      ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);
+      ctx.fillStyle=col;
+      ctx.shadowColor=col;ctx.shadowBlur=14;
+      ctx.fill();ctx.shadowBlur=0;
+      const oa=PT*2.2+idx*1.257;
+      ctx.beginPath();ctx.arc(x+r1*Math.cos(oa),y+r1*Math.sin(oa),2,0,Math.PI*2);
+      ctx.fillStyle=col+'cc';
+      ctx.shadowColor=col;ctx.shadowBlur=6;
+      ctx.fill();ctx.shadowBlur=0;
+    }else if(MIDS.includes(idx)){
+      ctx.beginPath();ctx.arc(x,y,3,0,Math.PI*2);
+      ctx.fillStyle='rgba(167,139,250,0.75)';
+      ctx.shadowColor='#a78bfa';ctx.shadowBlur=5;
+      ctx.fill();ctx.shadowBlur=0;
+    }else if(BASE.includes(idx)){
+      ctx.beginPath();ctx.arc(x,y,3.5,0,Math.PI*2);
+      ctx.fillStyle='rgba(124,58,237,0.85)';
+      ctx.shadowColor='#7c3aed';ctx.shadowBlur=6;
+      ctx.fill();ctx.shadowBlur=0;
+    }else if(idx===0){
+      ctx.save();
+      ctx.translate(x,y);
+      ctx.rotate(PT*0.35);
+      const wr=10+2*Math.sin(PT);
+      ctx.beginPath();ctx.arc(0,0,wr,0,Math.PI*2);
+      ctx.strokeStyle=col+'80';ctx.lineWidth=1.5;
+      ctx.setLineDash([4,3]);ctx.stroke();ctx.setLineDash([]);
+      ctx.restore();
+    }
+  });
+  ctx.restore();
+
+  if(rippleOn){
+    const palm=lm[9];
+    const px=lx(palm),py=ly(palm);
+    const t1=(rippleT%1.4)/1.4;
+    const t2=((rippleT+0.6)%1.4)/1.4;
+    [[t1,col,2],[t2,'rgba(6,182,212',1.5]].forEach(([t,c,lw])=>{
+      const rr=t*72,al=(1-t)*0.5;
+      ctx.beginPath();ctx.arc(px,py,rr,0,Math.PI*2);
+      ctx.strokeStyle=c.startsWith('#')?c+Math.round(al*255).toString(16).padStart(2,'0'):c+`,${al})`;
+      ctx.lineWidth=lw;ctx.stroke();
+    });
+    rippleT+=0.025;
+    if(rippleT>2.8){rippleOn=false;rippleT=0;}
+  }
+}
+
+/* ═══ HOLOGRAM ════════════════════════════ */
+function showHolo(id){
+  const g=G[id];if(!g)return;
+  document.getElementById('h-idle').style.display='none';
+  const em=document.getElementById('holo-emoji');
+  em.style.display='block';em.textContent=g.e;
+  em.style.filter=`drop-shadow(0 0 18px ${g.c}88) drop-shadow(0 0 36px ${g.c}33)`;
+  document.getElementById('holo-name').textContent=g.n;
+  document.getElementById('holo-name').style.color=g.c;
+  document.getElementById('holo-name').style.textShadow=`0 0 14px ${g.c}99`;
+  document.getElementById('hp-id').textContent=id.toUpperCase();
+  document.getElementById('hglow').style.background=`radial-gradient(circle,${g.c}18 0%,${g.c}06 50%,transparent 70%)`;
+  document.querySelectorAll('.hring').forEach((r,i)=>{r.style.borderColor=i===1?`${g.c}28`:`${g.c}18`;});
+  document.getElementById('stype').textContent=g.t;
+  document.getElementById('shand').textContent='ACTIVE';
+  document.getElementById('cfill').style.width='92%';
+  document.getElementById('cval').textContent='92%';
+}
+function popHolo(){const em=document.getElementById('holo-emoji');em.classList.remove('pop');void em.offsetWidth;em.classList.add('pop');}
+function clearHolo(){
+  document.getElementById('h-idle').style.display='flex';
+  document.getElementById('holo-emoji').style.display='none';
+  document.getElementById('holo-name').textContent='';
+  document.getElementById('hp-id').textContent='NO GESTURE';
+  document.getElementById('stype').textContent='—';document.getElementById('shand').textContent='NONE';
+  document.getElementById('cfill').style.width='0%';document.getElementById('cval').textContent='—';
+}
+
+/* ═══ UI STATE ════════════════════════════ */
+const FIDS=['ft','fi','fm','fr','fp'];
+const DIRS={up:'dup',down:'ddn',left:'dlft',right:'drgt'};
+let detTotal=0,holdId=null,holdF=0,lastTrig=null,allSigns=[],curId=null;
+let HOLD_DYNAMIC=8;
+let overlayTimer=null;
+
+function setFingers(st){st.forEach((s,i)=>{const e=document.getElementById(FIDS[i]);if(e)e.className='fifill'+(s?' up':'');});}
+function setDir(d){Object.entries(DIRS).forEach(([k,id])=>{const e=document.getElementById(id);if(e)e.classList.toggle('on',k===d);});}
+
+function setGestureUI(id){
+  const g=G[id];if(!g)return;
+  const gn=document.getElementById('g-name');
+  if(gn){gn.textContent=g.n;gn.style.color=g.c;gn.style.textShadow=`0 0 14px ${g.c}88`;}
+  const gd=document.getElementById('g-desc');if(gd)gd.textContent=g.d;
+  showHolo(id);
+  const overlayOn=document.getElementById('st-overlay');
+  if(overlayOn&&overlayOn.classList.contains('on')){
+    const ov=document.getElementById('goverlay');
+    const oe=document.getElementById('go-emoji');
+    const on=document.getElementById('go-name');
+    if(ov&&oe&&on){oe.textContent=g.e;on.textContent=g.n;on.style.color=g.c;ov.classList.add('show');}
+  }
+  if(id!==curId){
+    curId=id;
+    document.getElementById('tb-idle').style.display='none';
+    const tw=document.getElementById('tx-word');
+    tw.style.display='flex';tw.classList.remove('in');void tw.offsetWidth;tw.classList.add('in');
+    document.getElementById('tx-emoji').textContent=g.e;
+    const tn=document.getElementById('tx-name');tn.textContent=g.n;tn.style.color=g.c;tn.style.textShadow=`0 0 20px ${g.c}88`;
+    document.getElementById('tx-type').textContent=g.t;
+  }
+}
+function clearGestureUI(){
+  if(curId===null)return;curId=null;
+  const gn=document.getElementById('g-name');if(gn){gn.textContent='SCANNING...';gn.style.color='var(--t3)';gn.style.textShadow='none';}
+  const gd=document.getElementById('g-desc');if(gd)gd.textContent='Show your hand to the camera';
+  clearHolo();
+  document.getElementById('tx-word').style.display='none';
+  document.getElementById('tb-idle').style.display='flex';
+  document.getElementById('goverlay').classList.remove('show');
+  if(CW&&CH)ctx.clearRect(0,0,CW,CH);
+}
+function showGestureLabel(text){
+  const el=document.getElementById('glabel');if(!el)return;
+  el.textContent=text;el.classList.add('show');
+  clearTimeout(overlayTimer);
+  overlayTimer=setTimeout(()=>el.classList.remove('show'),1800);
+}
+function onGestureFired(id){
+  if(id===lastTrig)return;lastTrig=id;
+  detTotal++;allSigns.push(id);
+  ['det-cnt'].forEach(k=>{const e=document.getElementById(k);if(e)e.textContent=detTotal+'×';});
+  const gc=document.getElementById('gcnt');if(gc)gc.textContent=detTotal+' SIGNS';
+  const gt=document.getElementById('gtot');if(gt)gt.textContent=detTotal;
+  const g=G[id];if(!g)return;
+  popHolo();rippleOn=true;rippleT=0;
+  const st=document.getElementById('st-flash');
+  const DM={up:'↑',down:'↓',left:'←',right:'→'};
+  if(DM[id]&&(!st||st.classList.contains('on'))){
+    const ov=document.getElementById('dflash'),dg=document.getElementById('dglyph');
+    if(ov&&dg){dg.textContent=DM[id];ov.classList.add('show');setTimeout(()=>ov.classList.remove('show'),700);}
+  }
+  showGestureLabel(g.e+' '+g.n);
+  speak(g.s);
+  const hist=document.getElementById('hist');
+  const item=document.createElement('div');item.className='hi';
+  item.innerHTML='<span class="hi-e">'+g.e+'</span><span class="hi-l">'+g.n+'</span>';
+  item.onclick=()=>speak(g.s);
+  hist.appendChild(item);hist.scrollLeft=hist.scrollWidth;
+  while(hist.children.length>32)hist.removeChild(hist.firstChild);
+  addHistoryLog(id);
+  if(currentTab==='gestures'){
+    document.querySelectorAll('.g-card').forEach(c=>c.classList.remove('active-card'));
+    const ac=document.getElementById('gcard-'+id);
+    if(ac){ac.classList.add('active-card');ac.scrollIntoView({block:'nearest',behavior:'smooth'});}
+  }
+  setTimeout(()=>{if(lastTrig===id)lastTrig=null;},1500);
+}
+function addHistoryLog(id){
+  const g=G[id];if(!g)return;
+  const log=document.getElementById('hist-log');if(!log)return;
+  const empty=log.querySelector('div[style*="opacity"]');
+  if(empty)empty.remove();
+  const item=document.createElement('div');item.className='hl-item';
+  item.innerHTML=`<div class="hl-e">${g.e}</div><div class="hl-info"><div class="hl-n">${g.n}</div><div class="hl-s">${g.s}</div></div><button class="hl-spk" onclick="speak('${g.s.replace(/'/g,"\\'")}')">▶ SPEAK</button>`;
+  log.prepend(item);
+  while(log.children.length>50)log.removeChild(log.lastChild);
+}
+function speakCurrent(){if(curId&&G[curId])speak(G[curId].s);}
+function speakAll(){if(!allSigns.length)return;const u=[...new Set(allSigns)].map(id=>G[id]?.n||id).join(', ');speak(u);}
+function clearHist(){const h=document.getElementById('hist');if(h)h.innerHTML='';}
+function clearAll(){
+  clearHist();clearGestureUI();allSigns=[];detTotal=0;curId=null;
+  const dc=document.getElementById('det-cnt');if(dc)dc.textContent='0×';
+  const gc=document.getElementById('gcnt');if(gc)gc.textContent='0 SIGNS';
+  const gt=document.getElementById('gtot');if(gt)gt.textContent='0';
+  lastTrig=null;holdId=null;holdF=0;
+  const log=document.getElementById('hist-log');
+  if(log)log.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100%;flex-direction:column;gap:8px;opacity:.3"><div style="font-size:28px">📊</div><div style="font-family:var(--fm);font-size:8px;color:var(--t3);letter-spacing:2px">NO HISTORY YET</div></div>';
+}
+
+/* ═══ FPS ═════════════════════════════════ */
+let fBuf=[],fLast=performance.now();
+function tickFPS(){
+  const now=performance.now(),dt=now-fLast;fLast=now;
+  if(dt>0&&dt<2000){
+    fBuf.push(1000/dt);if(fBuf.length>45)fBuf.shift();
+    const avg=Math.round(fBuf.reduce((a,b)=>a+b,0)/fBuf.length);
+    const txt=avg+' FPS';
+    ['fpsd','fps-badge','fps2'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent=txt;});
+    const fd=document.getElementById('fpsdot');if(fd)fd.style.background=avg>=20?'var(--g)':avg>=10?'var(--a)':'var(--r)';
+  }
+}
+
+/* ═══ LOADER HELPERS ══════════════════════ */
+function stepSet(n,s){
+  const el=document.getElementById('ls'+n),ss=document.getElementById('ss'+n);
+  if(el)el.className='ld-step '+(s==='active'?'active':s==='done'?'done':s==='err'?'err':'');
+  if(ss){ss.className='step-st '+(s==='done'?'ds':s==='active'?'as':s==='err'?'es':'');ss.textContent=s==='done'?'✓ OK':s==='active'?'...':s==='err'?'✗ ERR':'WAIT';}
+  const f=document.getElementById('ldfill');if(f)f.style.width=(n===1?33:n===2?66:100)+'%';
+}
+function ldMsg(t){const e=document.getElementById('ldmsg');if(e)e.textContent=t;}
+
+/* ═══ TAB / PANEL SYSTEM ══════════════════ */
+let currentTab='live';
+const PANELS={
+  live:    ['cam-panel','holo-panel','rp'],
+  gestures:['cam-panel','holo-panel','gesture-panel'],
+  voice:   ['cam-panel','holo-panel','voice-panel'],
+  history: ['cam-panel','holo-panel','history-panel'],
+  settings:['cam-panel','holo-panel','settings-panel'],
+};
+const ALL_RIGHT=['rp','gesture-panel','history-panel','voice-panel','settings-panel'];
+
+function switchTab(tab){
+  if(tab===currentTab)return;
+  currentTab=tab;
+  document.querySelectorAll('.sb-i').forEach(el=>{
+    el.classList.toggle('act',el.dataset.tab===tab);
+  });
+  ALL_RIGHT.forEach(id=>{
+    const el=document.getElementById(id);
+    if(el)el.style.display='none';
+  });
+  const show=PANELS[tab]||PANELS.live;
+  show.forEach(id=>{
+    const el=document.getElementById(id);
+    if(!el)return;
+    el.style.display='flex';
+    if(id!=='cam-panel'&&id!=='holo-panel')el.style.flexDirection='column';
+  });
+  if(tab==='gestures')buildGestureGrid('ALL');
+}
+
+function initPanels(){
+  ALL_RIGHT.forEach(id=>{
+    const el=document.getElementById(id);
+    if(el&&id!=='rp')el.style.display='none';
+  });
+  const rp=document.getElementById('rp');
+  if(rp)rp.style.display='flex';
+}
+initPanels();
+
+/* ═══ GESTURE GRID ════════════════════════ */
+let currentFilter='ALL';
+function buildGestureGrid(filter){
+  currentFilter=filter;
+  document.querySelectorAll('.gp-ft').forEach(b=>{
+    b.classList.toggle('act',b.textContent===filter);
+  });
+  const grid=document.getElementById('gp-grid');
+  if(!grid)return;
+  grid.innerHTML='';
+  const entries=Object.entries(G).filter(([,g])=>filter==='ALL'||g.t===filter);
+  document.getElementById('gp-count').textContent=entries.length+' GESTURE'+(entries.length!==1?'S':'');
+  entries.forEach(([id,g])=>{
+    const card=document.createElement('div');
+    card.className='g-card'+(curId===id?' active-card':'');
+    card.id='gcard-'+id;
+    card.innerHTML=`<div class="gc-e">${g.e}</div><div class="gc-n">${g.n}</div><div class="gc-t">${g.t}</div><div class="gc-play" title="Speak">▶</div>`;
+    card.onclick=(e)=>{
+      if(e.target.classList.contains('gc-play')){speak(g.s);return;}
+      document.querySelectorAll('.g-card').forEach(c=>c.classList.remove('active-card'));
+      card.classList.add('active-card');
+      speak(g.s);
+      showHolo(id);
+      setGestureUI(id);
+    };
+    grid.appendChild(card);
+  });
+}
+function filterGestures(filter){buildGestureGrid(filter);}
+
+/* ═══ MAIN INIT ═══════════════════════════ */
+async function startApp(){
+  const errEl=document.getElementById('lderr'),btn=document.getElementById('ldretry');
+  if(errEl)errEl.style.display='none';if(btn)btn.style.display='none';
+  try{
+    stepSet(1,'active');ldMsg('Requesting camera...');
+    const stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'user'},width:{ideal:1280},height:{ideal:720}},audio:false});
+    videoEl.srcObject=stream;
+    await new Promise((res,rej)=>{videoEl.onloadeddata=res;videoEl.onerror=e=>rej(new Error('Video: '+e));setTimeout(res,4000);});
+    await videoEl.play().catch(()=>{});
+    stepSet(1,'done');ldMsg('Camera active...');
+
+    stepSet(2,'active');ldMsg('Loading AI model (5-10s)...');
+    const hands=new Hands({locateFile:f=>`https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}`});
+    hands.setOptions({maxNumHands:1,modelComplexity:1,minDetectionConfidence:0.70,minTrackingConfidence:0.55});
+    hands.onResults(result=>{
+      tickFPS();
+      const lm=(result.multiHandLandmarks&&result.multiHandLandmarks.length)?result.multiHandLandmarks[0]:null;
+      if(lm){
+        const{id,st,dir}=detectGesture(lm);
+        setFingers(st);setDir(dir);
+        const col=(id&&G[id])?G[id].c:'#a78bfa';
+        drawHand(lm,col);
+        if(id){
+          setGestureUI(id);
+          if(id===holdId){holdF++;if(holdF===HOLD_DYNAMIC)onGestureFired(id);}
+          else{holdId=id;holdF=0;}
+        }else{clearGestureUI();holdId=null;holdF=0;}
+      }else{
+        clearGestureUI();setFingers([0,0,0,0,0]);setDir(null);holdId=null;holdF=0;
+        if(CW&&CH)ctx.clearRect(0,0,CW,CH);
+      }
+    });
+
+    const cam=new Camera(videoEl,{onFrame:async()=>{await hands.send({image:videoEl});},width:1280,height:720});
+    await cam.start();
+    stepSet(2,'done');ldMsg('Model loaded...');
+
+    stepSet(3,'active');ldMsg('Starting...');
+    await new Promise(r=>setTimeout(r,500));
+    stepSet(3,'done');ldMsg('Ready!');
+    document.getElementById('ldfill').style.width='100%';
+    await new Promise(r=>setTimeout(r,700));
+
+    document.getElementById('loader').style.display='none';
+    document.getElementById('stxt').textContent='LIVE';
+    const cb=document.getElementById('cam-badge');if(cb){cb.textContent='LIVE';cb.classList.add('live');}
+    speak('SignaVoice version 4 ready. Show your hand to begin.');
+  }catch(e){
+    console.error(e);
+    const n=videoEl.srcObject?2:1;stepSet(n,'err');ldMsg('Failed');
+    if(errEl){errEl.style.display='block';errEl.textContent=e.name==='NotAllowedError'?'Camera permission denied. Allow camera in browser settings.':e.name==='NotFoundError'?'No camera found. Connect a webcam.':'Error: '+e.message;}
+    if(btn)btn.style.display='block';
+  }
+}
+
+/* ═══ AUTO-START ══════════════════════════ */
+(async()=>{
+  try{
+    const t=await navigator.mediaDevices.getUserMedia({video:true});
+    t.getTracks().forEach(k=>k.stop());
+    startApp();
+  }catch(e){
+    const b=document.getElementById('ldretry');
+    if(b)b.style.display='block';
+    ldMsg('Click START to begin');
+  }
+})();
+</script>
+</body>
+</html>
